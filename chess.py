@@ -9,6 +9,10 @@ size = (9 * box_size, 9 * box_size)
 screen = pygame.display.set_mode(size)
 pygame.display.set_caption("Chess")
 
+sprites = pygame.image.load("sprites_classical.png")
+pawn = sprites.subsurface(1000, 0, 200, 200)
+pawn = pygame.transform.scale(pawn, (box_size, box_size))
+
 field=[[14,13,12,16,15,12,13,14],
        [11,11,11,11,11,11,11,11],
        [ 0, 0, 0, 0, 0, 0, 0, 0],
@@ -18,14 +22,11 @@ field=[[14,13,12,16,15,12,13,14],
        [ 1, 1, 1, 1, 1, 1, 1, 1],
        [ 4, 3, 2, 6, 5, 2, 3, 4]]
 
-field[1][3]
-
 def draw_field():
     for row in range(8):
         for col in range(8):
-            print(field[row][col])
-
-draw_field()
+            if field[row][col] == 1:
+                screen.blit(pawn, (col*box_size, row*box_size))
 
 running = True
 while running:
@@ -33,6 +34,8 @@ while running:
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             running = False
+    
+    draw_field()
     pygame.display.flip()
     clock.tick(fps)
 
