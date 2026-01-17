@@ -18,7 +18,14 @@ field=[[14,13,12,16,15,12,13,14],
        [ 1, 1, 1, 1, 1, 1, 1, 1],
        [ 4, 3, 2, 6, 5, 2, 3, 4]]
 
-#def draw_field():
+field[1][3]
+
+def draw_field():
+    for row in range(8):
+        for col in range(8):
+            print(field[row][col])
+
+draw_field()
 
 running = True
 while running:
