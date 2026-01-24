@@ -16,7 +16,16 @@ white_bishop = sprites.subsurface(400, 0, 200, 200)
 white_bishop = pygame.transform.scale(white_bishop, (box_size, box_size))
 white_knight = sprites.subsurface(600, 0, 200, 200)
 white_knight = pygame.transform.scale(white_knight, (box_size, box_size))
-
+white_rook = sprites.subsurface(800, 0, 200, 200)
+white_rook = pygame.transform.scale(white_rook, (box_size, box_size))
+white_queen = sprites.subsurface(0, 0, 200, 200)
+white_queen = pygame.transform.scale(white_queen, (box_size, box_size)) 
+white_king = sprites.subsurface(200, 0, 200, 200)
+white_king = pygame.transform.scale(white_king, (box_size, box_size))
+black_pawn = sprites.subsurface(1000, 200, 200, 200)
+black_pawn = pygame.transform.scale(black_pawn, (box_size, box_size))
+black_bishop = sprites.subsurface(400, 200, 200, 200)
+black_bishop = pygame.transform.scale(black_bishop, (box_size, box_size))
 
 field=[[14,13,12,16,15,12,13,14],
        [11,11,11,11,11,11,11,11],
@@ -30,10 +39,28 @@ field=[[14,13,12,16,15,12,13,14],
 def draw_field():
     for row in range(8):
         for col in range(8):
+            if (row+col) % 2 == 0:
+                color = (235, 209, 166)
+            else:
+                color = (165, 94, 34)
+            pygame.draw.rect(screen, color, 
+                             ((col+1)*box_size, row*box_size, box_size, box_size))
             if field[row][col] == 1:
                 screen.blit(white_pawn, ((col+1)*box_size, row*box_size))
             elif field[row][col] == 2:
                 screen.blit(white_bishop, ((col+1)*box_size, row*box_size))
+            elif field[row][col] == 3:
+                screen.blit(white_knight, ((col+1)*box_size, row*box_size))
+            elif field[row][col] == 4:
+                screen.blit(white_rook, ((col+1)*box_size, row*box_size))
+            elif field[row][col] == 5:
+                screen.blit(white_queen, ((col+1)*box_size, row*box_size))
+            elif field[row][col] == 6:
+                screen.blit(white_king, ((col+1)*box_size, row*box_size))
+            elif field[row][col] == 11:
+                screen.blit(black_pawn, ((col+1)*box_size, row*box_size))
+            elif field[row][col] == 12:
+                screen.blit(black_bishop, ((col+1)*box_size, row*box_size))
             pygame.draw.rect(screen, (255, 255, 255), 
                              ((col+1)*box_size, row*box_size, box_size, box_size), 2)
 
