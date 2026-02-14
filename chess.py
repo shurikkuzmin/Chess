@@ -35,7 +35,7 @@ black_queen = pygame.transform.scale(black_queen, (box_size, box_size))
 black_king = sprites.subsurface(200, 200, 200, 200)
 black_king = pygame.transform.scale(black_king, (box_size, box_size))
 
-field=[[14,13,12,16,15,12,13,14],
+field=[[14,13,12,16,15,12,13,14], 
        [11,11,11,11,11,11,11,11],
        [ 0, 0, 0, 0, 0, 0, 0, 0],
        [ 0, 0, 0, 0, 0, 0, 0, 0],
@@ -44,7 +44,33 @@ field=[[14,13,12,16,15,12,13,14],
        [ 1, 1, 1, 1, 1, 1, 1, 1],
        [ 4, 3, 2, 6, 5, 2, 3, 4]]
 
-def draw_field():
+def draw_piece(piece, x, y):
+    if piece == 1:
+        screen.blit(white_pawn, (x, y))
+    elif piece == 2:
+        screen.blit(white_bishop, (x, y))
+    elif piece == 3:
+        screen.blit(white_knight, (x, y))
+    elif piece == 4:
+        screen.blit(white_rook, (x, y))
+    elif piece == 5:
+        screen.blit(white_queen, (x, y))
+    elif piece == 6:
+        screen.blit(white_king, (x, y))
+    elif piece == 11:
+        screen.blit(black_pawn, (x, y))
+    elif piece == 12:
+        screen.blit(black_bishop, (x, y))
+    elif piece == 13:
+        screen.blit(black_knight, (x, y))
+    elif piece == 14:
+        screen.blit(black_rook, (x, y))
+    elif piece == 15:
+        screen.blit(black_queen, (x, y))
+    elif piece == 16:
+        screen.blit(black_king, (x, y))
+
+def draw_field(piece, mouse_x, mouse_y):
     letters = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H']
     numbers = ['8', '7', '6', '5', '4', '3', '2', '1']
     
@@ -66,43 +92,39 @@ def draw_field():
                 color = (235, 209, 166)
             else:
                 color = (165, 94, 34)
+            
             pygame.draw.rect(screen, color, 
                              ((col+1)*box_size, row*box_size, box_size, box_size))
-            if field[row][col] == 1:
-                screen.blit(white_pawn, ((col+1)*box_size, row*box_size))
-            elif field[row][col] == 2:
-                screen.blit(white_bishop, ((col+1)*box_size, row*box_size))
-            elif field[row][col] == 3:
-                screen.blit(white_knight, ((col+1)*box_size, row*box_size))
-            elif field[row][col] == 4:
-                screen.blit(white_rook, ((col+1)*box_size, row*box_size))
-            elif field[row][col] == 5:
-                screen.blit(white_queen, ((col+1)*box_size, row*box_size))
-            elif field[row][col] == 6:
-                screen.blit(white_king, ((col+1)*box_size, row*box_size))
-            elif field[row][col] == 11:
-                screen.blit(black_pawn, ((col+1)*box_size, row*box_size))
-            elif field[row][col] == 12:
-                screen.blit(black_bishop, ((col+1)*box_size, row*box_size))
-            elif field[row][col] == 13:
-                screen.blit(black_knight, ((col+1)*box_size, row*box_size))
-            elif field[row][col] == 14:
-                screen.blit(black_rook, ((col+1)*box_size, row*box_size))
-            elif field[row][col] == 15:
-                screen.blit(black_queen, ((col+1)*box_size, row*box_size))
-            elif field[row][col] == 16:
-                screen.blit(black_king, ((col+1)*box_size, row*box_size))
             pygame.draw.rect(screen, (255, 255, 255), 
                              ((col+1)*box_size, row*box_size, box_size, box_size), 2)
+            draw_piece(field[row][col], (col+1)*box_size, row*box_size)
+    if piece != -1:
+        draw_piece(piece, mouse_x, mouse_y)
+
 
 running = True
 while running:
     screen.fill("black")
+    piece = -1
+    mouse_x = -1
+    mouse_y = -1    
+
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             running = False
+        if event.type == pygame.MOUSEBUTTONDOWN:
+            mouse_x, mouse_y = event.pos
+            col = mouse_x // box_size - 1
+            row = mouse_y // box_size
+            
+            if 0 <= row < 8 and 0 <= col < 8:
+                piece = field[row][col]
+                if piece != 0:
+                    print(piece)
+            #if 0 <= row < 8 and 0 <= col < 8:
+            #    print(f"Clicked on: {chr(col + ord('A'))}{8 - row}")
     
-    draw_field()
+    draw_field(piece, mouse_x, mouse_y)
     pygame.display.flip()
     clock.tick(fps)
 
