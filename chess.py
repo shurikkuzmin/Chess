@@ -9,6 +9,10 @@ size = (9 * box_size, 9 * box_size)
 screen = pygame.display.set_mode(size)
 pygame.display.set_caption("Chess")
 
+chosen_piece = 0
+chosen_col = -1
+chosen_row = -1
+
 sprites = pygame.image.load("sprites_classical.png")
 white_pawn = sprites.subsurface(1000, 0, 200, 200)
 white_pawn = pygame.transform.scale(white_pawn, (box_size, box_size))
@@ -70,7 +74,7 @@ def draw_piece(piece, x, y):
     elif piece == 16:
         screen.blit(black_king, (x, y))
 
-def draw_field(piece, mouse_x, mouse_y):
+def draw_field(mouse_x, mouse_y):
     letters = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H']
     numbers = ['8', '7', '6', '5', '4', '3', '2', '1']
     
@@ -98,8 +102,8 @@ def draw_field(piece, mouse_x, mouse_y):
             pygame.draw.rect(screen, (255, 255, 255), 
                              ((col+1)*box_size, row*box_size, box_size, box_size), 2)
             draw_piece(field[row][col], (col+1)*box_size, row*box_size)
-    if piece != -1:
-        draw_piece(piece, mouse_x, mouse_y)
+    if chosen_piece != 0:
+        draw_piece(chosen_piece, mouse_x, mouse_y)
 
 
 running = True
@@ -114,17 +118,17 @@ while running:
             running = False
         if event.type == pygame.MOUSEBUTTONDOWN:
             mouse_x, mouse_y = event.pos
-            col = mouse_x // box_size - 1
-            row = mouse_y // box_size
-            
-            if 0 <= row < 8 and 0 <= col < 8:
-                piece = field[row][col]
-                if piece != 0:
+            chosen_col = mouse_x // box_size - 1
+            chosen_row = mouse_y // box_size
+            chosen_piece = 0
+            if 0 <= chosen_row < 8 and 0 <= chosen_col < 8:
+                chosen_piece = field[chosen_row][chosen_col]
+                if chosen_piece != 0:
                     print(piece)
             #if 0 <= row < 8 and 0 <= col < 8:
             #    print(f"Clicked on: {chr(col + ord('A'))}{8 - row}")
     
-    draw_field(piece, mouse_x, mouse_y)
+    draw_field(mouse_x, mouse_y)
     pygame.display.flip()
     clock.tick(fps)
 
