@@ -74,7 +74,14 @@ def draw_piece(piece, x, y):
     elif piece == 16:
         screen.blit(black_king, (x, y))
 
-def draw_field(mouse_x, mouse_y):
+def highlight_cell(x, y):
+    col = x // box_size - 1
+    row = y // box_size
+    if 0 <= row < 8 and 0 <= col < 8:
+        if field[row][col] == 0 and (row, col) != (chosen_row, chosen_col):
+            pygame.draw.rect(screen, (255, 255, 0), 
+                             ((col+1)*box_size, row*box_size, box_size, box_size), 3)
+def draw_field():
     letters = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H']
     numbers = ['8', '7', '6', '5', '4', '3', '2', '1']
     
@@ -103,15 +110,15 @@ def draw_field(mouse_x, mouse_y):
                              ((col+1)*box_size, row*box_size, box_size, box_size), 2)
             draw_piece(field[row][col], (col+1)*box_size, row*box_size)
     if chosen_piece != 0:
-        draw_piece(chosen_piece, mouse_x, mouse_y)
+        mouse_x, mouse_y = pygame.mouse.get_pos()
+        highlight_cell(mouse_x, mouse_y)
+        draw_piece(chosen_piece, mouse_x - box_size // 2, mouse_y - box_size // 2)
 
 
 running = True
 while running:
     screen.fill("black")
     piece = -1
-    mouse_x = -1
-    mouse_y = -1    
 
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
@@ -123,12 +130,13 @@ while running:
             chosen_piece = 0
             if 0 <= chosen_row < 8 and 0 <= chosen_col < 8:
                 chosen_piece = field[chosen_row][chosen_col]
-                if chosen_piece != 0:
-                    print(piece)
-            #if 0 <= row < 8 and 0 <= col < 8:
-            #    print(f"Clicked on: {chr(col + ord('A'))}{8 - row}")
+                field[chosen_row][chosen_col] = 0
+        if event.type == pygame.MOUSEBUTTONUP:
+            if chosen_piece != 0:
+                field[chosen_row][chosen_col] = chosen_piece
+                chosen_piece = 0
     
-    draw_field(mouse_x, mouse_y)
+    draw_field()
     pygame.display.flip()
     clock.tick(fps)
 
