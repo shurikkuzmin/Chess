@@ -12,6 +12,7 @@ pygame.display.set_caption("Chess")
 chosen_piece = 0
 chosen_col = -1
 chosen_row = -1
+offset = 0
 
 sprites = pygame.image.load("sprites_classical.png")
 white_pawn = sprites.subsurface(1000, 0, 200, 200)
@@ -74,12 +75,23 @@ def draw_piece(piece, x, y):
     elif piece == 16:
         screen.blit(black_king, (x, y))
 
-def highlight_cell(x, y):
+def allowed_cell():
+    x, y = pygame.mouse.get_pos()
     col = x // box_size - 1
     row = y // box_size
     if 0 <= row < 8 and 0 <= col < 8:
-        if field[row][col] == 0 and (row, col) != (chosen_row, chosen_col):
-            pygame.draw.rect(screen, (255, 255, 0), 
+        counter_offset = 10 if offset == 0 else 0
+        if field[row][col] == 0 or \
+            (1 + counter_offset <= field[row][col] <= 6 + counter_offset):
+            if row != chosen_row or col != chosen_col:
+                return True, row, col
+    return False, -1, -1
+
+
+def highlight_cell():
+    allowed, row, col = allowed_cell()
+    if allowed:
+        pygame.draw.rect(screen, (255, 255, 0), 
                              ((col+1)*box_size, row*box_size, box_size, box_size), 3)
 def draw_field():
     letters = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H']
@@ -111,7 +123,7 @@ def draw_field():
             draw_piece(field[row][col], (col+1)*box_size, row*box_size)
     if chosen_piece != 0:
         mouse_x, mouse_y = pygame.mouse.get_pos()
-        highlight_cell(mouse_x, mouse_y)
+        highlight_cell()
         draw_piece(chosen_piece, mouse_x - box_size // 2, mouse_y - box_size // 2)
 
 
@@ -129,10 +141,15 @@ while running:
             chosen_row = mouse_y // box_size
             chosen_piece = 0
             if 0 <= chosen_row < 8 and 0 <= chosen_col < 8:
-                chosen_piece = field[chosen_row][chosen_col]
-                field[chosen_row][chosen_col] = 0
+                if 1 + offset <= field[chosen_row][chosen_col] <= 6 + offset:
+                    chosen_piece = field[chosen_row][chosen_col]
+                    field[chosen_row][chosen_col] = 0
         if event.type == pygame.MOUSEBUTTONUP:
             if chosen_piece != 0:
+                allowed, new_row, new_col = allowed_cell()
+                if allowed:
+                    offset = 10 if offset == 0 else 0
+                    chosen_row, chosen_col = new_row, new_col
                 field[chosen_row][chosen_col] = chosen_piece
                 chosen_piece = 0
     
