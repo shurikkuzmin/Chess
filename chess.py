@@ -75,6 +75,17 @@ def draw_piece(piece, x, y):
     elif piece == 16:
         screen.blit(black_king, (x, y))
 
+def is_valid_move():
+    if chosen_piece in [1, 11]:  # Pawn
+        direction = 1 if chosen_piece == 1 else -1
+        
+    return True
+        #start_row = 6 if chosen_piece == 1 else 1
+        #if (chosen_row + direction == new_row and field[new_row][new_col] == 0) or \
+        #   (chosen_row == start_row and chosen_row + 2*direction == new_row \
+        #    and field[new_row][new_col] == 0 and field[chosen_row + direction][new_col] == 0) \
+        #        or
+
 def allowed_cell():
     x, y = pygame.mouse.get_pos()
     col = x // box_size - 1
@@ -84,7 +95,8 @@ def allowed_cell():
         if field[row][col] == 0 or \
             (1 + counter_offset <= field[row][col] <= 6 + counter_offset):
             if row != chosen_row or col != chosen_col:
-                return True, row, col
+                if is_valid_move():
+                    return True, row, col
     return False, -1, -1
 
 
