@@ -75,11 +75,29 @@ def draw_piece(piece, x, y):
     elif piece == 16:
         screen.blit(black_king, (x, y))
 
-def is_valid_move():
+def is_valid_move(row, col):
     if chosen_piece in [1, 11]:  # Pawn
-        direction = 1 if chosen_piece == 1 else -1
-        
-    return True
+        direction = -1 if chosen_piece == 1 else 1
+        if chosen_row + direction == row: 
+            if field[row][col] != 0 and abs(chosen_col - col) == 1:
+                return True
+            if field[row][col] == 0 and col == chosen_col:
+                return True
+        if (chosen_row == 6 and chosen_piece == 1) \
+            or (chosen_row == 1 and chosen_piece == 11):
+            if (chosen_row + 2*direction == row) and col == chosen_col \
+                and field[row][col] == 0 and field[chosen_row + direction][col] == 0: 
+                 return True
+        return False
+    if chosen_piece in [2, 12]:
+        if abs(chosen_row - row) == abs(chosen_col - col):  # Bishop
+            dir_row = 1 if row > chosen_row else -1
+            dir_col = 1 if col > chosen_col else -1
+            for i in range(1, abs(chosen_row - row)):
+                if field[chosen_row + i*dir_row][chosen_col + i*dir_col] != 0:
+                    return False
+            return True
+    return False
         #start_row = 6 if chosen_piece == 1 else 1
         #if (chosen_row + direction == new_row and field[new_row][new_col] == 0) or \
         #   (chosen_row == start_row and chosen_row + 2*direction == new_row \
@@ -95,7 +113,7 @@ def allowed_cell():
         if field[row][col] == 0 or \
             (1 + counter_offset <= field[row][col] <= 6 + counter_offset):
             if row != chosen_row or col != chosen_col:
-                if is_valid_move():
+                if is_valid_move(row, col):
                     return True, row, col
     return False, -1, -1
 
