@@ -13,6 +13,12 @@ chosen_piece = 0
 chosen_col = -1
 chosen_row = -1
 offset = 0
+white_king_moved = False
+black_king_moved = False
+white_left_rook_moved = False
+white_right_rook_moved = False
+black_left_rook_moved = False
+black_right_rook_moved = False
 
 sprites = pygame.image.load("sprites_classical.png")
 white_pawn = sprites.subsurface(1000, 0, 200, 200)
@@ -23,9 +29,9 @@ white_knight = sprites.subsurface(600, 0, 200, 200)
 white_knight = pygame.transform.scale(white_knight, (box_size, box_size))
 white_rook = sprites.subsurface(800, 0, 200, 200)
 white_rook = pygame.transform.scale(white_rook, (box_size, box_size))
-white_queen = sprites.subsurface(0, 0, 200, 200)
+white_queen = sprites.subsurface(200, 0, 200, 200)
 white_queen = pygame.transform.scale(white_queen, (box_size, box_size)) 
-white_king = sprites.subsurface(200, 0, 200, 200)
+white_king = sprites.subsurface(0, 0, 200, 200)
 white_king = pygame.transform.scale(white_king, (box_size, box_size))
 black_pawn = sprites.subsurface(1000, 200, 200, 200)
 black_pawn = pygame.transform.scale(black_pawn, (box_size, box_size))
@@ -35,19 +41,19 @@ black_knight = sprites.subsurface(600, 200, 200, 200)
 black_knight = pygame.transform.scale(black_knight, (box_size, box_size))
 black_rook = sprites.subsurface(800, 200, 200, 200)
 black_rook = pygame.transform.scale(black_rook, (box_size, box_size))
-black_queen = sprites.subsurface(0, 200, 200, 200)
+black_queen = sprites.subsurface(200, 200, 200, 200)
 black_queen = pygame.transform.scale(black_queen, (box_size, box_size)) 
-black_king = sprites.subsurface(200, 200, 200, 200)
+black_king = sprites.subsurface(0, 200, 200, 200)
 black_king = pygame.transform.scale(black_king, (box_size, box_size))
 
-field=[[14,13,12,16,15,12,13,14], 
+field=[[14,13,12,15,16,12,13,14], 
        [11,11,11,11,11,11,11,11],
        [ 0, 0, 0, 0, 0, 0, 0, 0],
        [ 0, 0, 0, 0, 0, 0, 0, 0],
        [ 0, 0, 0, 0, 0, 0, 0, 0],
        [ 0, 0, 0, 0, 0, 0, 0, 0],
        [ 1, 1, 1, 1, 1, 1, 1, 1],
-       [ 4, 3, 2, 6, 5, 2, 3, 4]]
+       [ 4, 3, 2, 5, 6, 2, 3, 4]]
 
 def draw_piece(piece, x, y):
     if piece == 1:
@@ -107,6 +113,17 @@ def is_valid_move(row, col):
             for i in range(1, abs(chosen_col - col)):
                 if field[chosen_row][chosen_col + i*dir_col] != 0:
                     return False
+            if chosen_piece == 4 and chosen_row == 7:
+                if chosen_col == 0 :
+                    white_left_rook_moved = True
+                elif chosen_col == 7:
+                    white_right_rook_moved = True
+            
+            if chosen_piece == 14 and chosen_row == 0:
+                if chosen_col == 0 :
+                    black_left_rook_moved = True
+                elif chosen_col == 7:
+                    black_right_rook_moved = True
             return True
         if chosen_col == col:
             dir_row = 1 if row > chosen_row else -1
@@ -114,7 +131,52 @@ def is_valid_move(row, col):
                 if field[chosen_row + i*dir_row][chosen_col] != 0:
                     return False
             return True
+    if chosen_piece in [5, 15]:  # Queen
+        if abs(chosen_row - row) == abs(chosen_col - col):  # Diagonal
+            dir_row = 1 if row > chosen_row else -1
+            dir_col = 1 if col > chosen_col else -1
+            for i in range(1, abs(chosen_row - row)):
+                if field[chosen_row + i*dir_row][chosen_col + i*dir_col] != 0:
+                    return False
+            return True
+        if chosen_row == row:  # Horizontal
+            dir_col = 1 if col > chosen_col else -1
+            for i in range(1, abs(chosen_col - col)):
+                if field[chosen_row][chosen_col + i*dir_col] != 0:
+                    return False
+            return True
+        if chosen_col == col:  # Vertical
+            dir_row = 1 if row > chosen_row else -1
+            for i in range(1, abs(chosen_row - row)):
+                if field[chosen_row + i*dir_row][chosen_col] != 0:
+                    return False
+            return True
+        if chosen_piece in [6, 16]:  # King
+            if abs(chosen_row - row) <= 1 and abs(chosen_col - col) <= 1:
+                if chosen_piece == 6:
+                    white_king_moved = True
+                else:
+                    black_king_moved = True
+                return True
+            if abs(chosen_col - col) == 2 and chosen_row == row:
+                if chosen_piece == 6 and not white_king_moved:
+                    if col == 6 and not white_right_rook_moved and\
+                          field[chosen_row][5] == 0 and field[chosen_row][6] == 0:
+                        return True
+                    if col == 2 and not white_left_rook_moved and\
+                          field[chosen_row][1] == 0 and field[chosen_row][2] == 0 \
+                            and field[chosen_row][3] == 0:
+                        return True
+                if chosen_piece == 16 and not black_king_moved:
+                    if col == 6 and not black_right_rook_moved and \
+                        field[chosen_row][5] == 0 and field[chosen_row][6] == 0:
+                        return True
+                    if col == 2 and not black_left_rook_moved and \
+                        field[chosen_row][1] == 0 and field[chosen_row][2] == 0 \
+                            and field[chosen_row][3] == 0:
+                        return True 
     return False
+
         #start_row = 6 if chosen_piece == 1 else 1
         #if (chosen_row + direction == new_row and field[new_row][new_col] == 0) or \
         #   (chosen_row == start_row and chosen_row + 2*direction == new_row \
