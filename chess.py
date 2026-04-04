@@ -97,6 +97,23 @@ def is_valid_move(row, col):
                 if field[chosen_row + i*dir_row][chosen_col + i*dir_col] != 0:
                     return False
             return True
+    if chosen_piece in [3, 13]:  # Knight
+        if (abs(chosen_row - row) == 2 and abs(chosen_col - col) == 1) or \
+           (abs(chosen_row - row) == 1 and abs(chosen_col - col) == 2):
+            return True
+    if chosen_piece in [4, 14]:  # Rook
+        if chosen_row == row:
+            dir_col = 1 if col > chosen_col else -1
+            for i in range(1, abs(chosen_col - col)):
+                if field[chosen_row][chosen_col + i*dir_col] != 0:
+                    return False
+            return True
+        if chosen_col == col:
+            dir_row = 1 if row > chosen_row else -1
+            for i in range(1, abs(chosen_row - row)):
+                if field[chosen_row + i*dir_row][chosen_col] != 0:
+                    return False
+            return True
     return False
         #start_row = 6 if chosen_piece == 1 else 1
         #if (chosen_row + direction == new_row and field[new_row][new_col] == 0) or \
