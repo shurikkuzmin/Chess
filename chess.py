@@ -242,6 +242,25 @@ def draw_field():
         highlight_cell()
         draw_piece(chosen_piece, mouse_x - box_size // 2, mouse_y - box_size // 2)
 
+def handle_movement_flags(piece, old_row, old_col):
+    """Update movement tracking flags for castling rights"""
+    global white_king_moved, black_king_moved, \
+        white_left_rook_moved, white_right_rook_moved, \
+        black_left_rook_moved, black_right_rook_moved
+    if piece == 6:  # White King
+        white_king_moved = True
+    elif piece == 16:  # Black King        
+        black_king_moved = True
+    elif piece == 4 and old_row == 7:  # White Rook         
+        if old_col == 0:
+            white_left_rook_moved = True
+        elif old_col == 7:
+            white_right_rook_moved = True
+    elif piece == 14 and old_row == 0:  # Black Rook
+        if old_col == 0:
+            black_left_rook_moved = True
+        elif old_col == 7:
+            black_right_rook_moved = True
 
 running = True
 while running:
@@ -268,20 +287,7 @@ while running:
                     handle_castling(chosen_piece, chosen_row, chosen_col, new_row, new_col)
                     
                     # Update movement tracking flags when move is completed
-                    if chosen_piece == 6:  # White King
-                        white_king_moved = True
-                    elif chosen_piece == 16:  # Black King
-                        black_king_moved = True
-                    elif chosen_piece == 4 and chosen_row == 7:  # White Rook
-                        if chosen_col == 0:
-                            white_left_rook_moved = True
-                        elif chosen_col == 7:
-                            white_right_rook_moved = True
-                    elif chosen_piece == 14 and chosen_row == 0:  # Black Rook
-                        if chosen_col == 0:
-                            black_left_rook_moved = True
-                        elif chosen_col == 7:
-                            black_right_rook_moved = True
+                    handle_movement_flags(chosen_piece, chosen_row, chosen_col)
                     
                     offset = 10 if offset == 0 else 0
                     chosen_row, chosen_col = new_row, new_col
