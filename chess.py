@@ -148,9 +148,6 @@ def is_valid_move(row, col):
             return True
         if abs(chosen_col - col) == 2 and chosen_row == row:
             if chosen_piece == 6 and not white_king_moved:
-                print("Castling attempt: white king",col,\
-                      "rook moved:",white_right_rook_moved,\
-                        white_left_rook_moved)
                 if col == 6 and not white_right_rook_moved and\
                         field[chosen_row][5] == 0 and field[chosen_row][6] == 0:
                     return True
@@ -187,6 +184,25 @@ def allowed_cell():
                     return True, row, col
     return False, -1, -1
 
+
+def handle_castling(piece, old_row, old_col, new_row, new_col):
+    """Move the rook when castling occurs"""
+    # White King castling
+    if piece == 6 and old_row == 7:
+        if new_col == 6:  # King-side castling (right)
+            field[7][5] = field[7][7]  # Move rook from h1 to f1
+            field[7][7] = 0
+        elif new_col == 2:  # Queen-side castling (left)
+            field[7][3] = field[7][0]  # Move rook from a1 to d1
+            field[7][0] = 0
+    # Black King castling
+    elif piece == 16 and old_row == 0:
+        if new_col == 6:  # King-side castling (right)
+            field[0][5] = field[0][7]  # Move rook from h8 to f8
+            field[0][7] = 0
+        elif new_col == 2:  # Queen-side castling (left)
+            field[0][3] = field[0][0]  # Move rook from a8 to d8
+            field[0][0] = 0
 
 def highlight_cell():
     allowed, row, col = allowed_cell()
@@ -248,6 +264,9 @@ while running:
             if chosen_piece != 0:
                 allowed, new_row, new_col = allowed_cell()
                 if allowed:
+                    # Handle castling - move rook if needed
+                    handle_castling(chosen_piece, chosen_row, chosen_col, new_row, new_col)
+                    
                     # Update movement tracking flags when move is completed
                     if chosen_piece == 6:  # White King
                         white_king_moved = True
