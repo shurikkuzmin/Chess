@@ -82,6 +82,9 @@ def draw_piece(piece, x, y):
         screen.blit(black_king, (x, y))
 
 def is_valid_move(row, col):
+    global white_king_moved, black_king_moved, \
+        white_left_rook_moved, white_right_rook_moved, \
+        black_left_rook_moved, black_right_rook_moved
     if chosen_piece in [1, 11]:  # Pawn
         direction = -1 if chosen_piece == 1 else 1
         if chosen_row + direction == row: 
@@ -113,17 +116,6 @@ def is_valid_move(row, col):
             for i in range(1, abs(chosen_col - col)):
                 if field[chosen_row][chosen_col + i*dir_col] != 0:
                     return False
-            if chosen_piece == 4 and chosen_row == 7:
-                if chosen_col == 0 :
-                    white_left_rook_moved = True
-                elif chosen_col == 7:
-                    white_right_rook_moved = True
-            
-            if chosen_piece == 14 and chosen_row == 0:
-                if chosen_col == 0 :
-                    black_left_rook_moved = True
-                elif chosen_col == 7:
-                    black_right_rook_moved = True
             return True
         if chosen_col == col:
             dir_row = 1 if row > chosen_row else -1
@@ -151,30 +143,29 @@ def is_valid_move(row, col):
                 if field[chosen_row + i*dir_row][chosen_col] != 0:
                     return False
             return True
-        if chosen_piece in [6, 16]:  # King
-            if abs(chosen_row - row) <= 1 and abs(chosen_col - col) <= 1:
-                if chosen_piece == 6:
-                    white_king_moved = True
-                else:
-                    black_king_moved = True
-                return True
-            if abs(chosen_col - col) == 2 and chosen_row == row:
-                if chosen_piece == 6 and not white_king_moved:
-                    if col == 6 and not white_right_rook_moved and\
-                          field[chosen_row][5] == 0 and field[chosen_row][6] == 0:
-                        return True
-                    if col == 2 and not white_left_rook_moved and\
-                          field[chosen_row][1] == 0 and field[chosen_row][2] == 0 \
-                            and field[chosen_row][3] == 0:
-                        return True
-                if chosen_piece == 16 and not black_king_moved:
-                    if col == 6 and not black_right_rook_moved and \
+    if chosen_piece in [6, 16]:  # King
+        if abs(chosen_row - row) <= 1 and abs(chosen_col - col) <= 1:
+            return True
+        if abs(chosen_col - col) == 2 and chosen_row == row:
+            if chosen_piece == 6 and not white_king_moved:
+                print("Castling attempt: white king",col,\
+                      "rook moved:",white_right_rook_moved,\
+                        white_left_rook_moved)
+                if col == 6 and not white_right_rook_moved and\
                         field[chosen_row][5] == 0 and field[chosen_row][6] == 0:
-                        return True
-                    if col == 2 and not black_left_rook_moved and \
+                    return True
+                if col == 2 and not white_left_rook_moved and\
                         field[chosen_row][1] == 0 and field[chosen_row][2] == 0 \
-                            and field[chosen_row][3] == 0:
-                        return True 
+                        and field[chosen_row][3] == 0:
+                    return True
+            if chosen_piece == 16 and not black_king_moved:
+                if col == 6 and not black_right_rook_moved and \
+                    field[chosen_row][5] == 0 and field[chosen_row][6] == 0:
+                    return True
+                if col == 2 and not black_left_rook_moved and \
+                    field[chosen_row][1] == 0 and field[chosen_row][2] == 0 \
+                        and field[chosen_row][3] == 0:
+                    return True 
     return False
 
         #start_row = 6 if chosen_piece == 1 else 1
@@ -257,6 +248,22 @@ while running:
             if chosen_piece != 0:
                 allowed, new_row, new_col = allowed_cell()
                 if allowed:
+                    # Update movement tracking flags when move is completed
+                    if chosen_piece == 6:  # White King
+                        white_king_moved = True
+                    elif chosen_piece == 16:  # Black King
+                        black_king_moved = True
+                    elif chosen_piece == 4 and chosen_row == 7:  # White Rook
+                        if chosen_col == 0:
+                            white_left_rook_moved = True
+                        elif chosen_col == 7:
+                            white_right_rook_moved = True
+                    elif chosen_piece == 14 and chosen_row == 0:  # Black Rook
+                        if chosen_col == 0:
+                            black_left_rook_moved = True
+                        elif chosen_col == 7:
+                            black_right_rook_moved = True
+                    
                     offset = 10 if offset == 0 else 0
                     chosen_row, chosen_col = new_row, new_col
                 field[chosen_row][chosen_col] = chosen_piece
