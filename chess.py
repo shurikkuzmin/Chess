@@ -262,6 +262,87 @@ def handle_movement_flags(piece, old_row, old_col):
         elif old_col == 7:
             black_right_rook_moved = True
 
+def handle_pawn_promotion(piece, row):
+    """Open promotion dialog when pawn reaches the last rank"""
+    if (piece == 1 and row == 0) or (piece == 11 and row == 7):
+        return show_promotion_dialog(piece)
+    return piece
+
+def show_promotion_dialog(pawn_piece):
+    """Display a dialog window to choose promotion piece"""
+    is_white = pawn_piece == 1
+    
+    # Promotion options: Queen, Rook, Bishop, Knight
+    if is_white:
+        options = [5, 4, 2, 3]  # Queen, Rook, Bishop, Knight (white)
+        promotion_pieces = [white_queen, white_rook, white_bishop, white_knight]
+    else:
+        options = [15, 14, 12, 13]  # Queen, Rook, Bishop, Knight (black)
+        promotion_pieces = [black_queen, black_rook, black_bishop, black_knight]
+    
+    option_names = ['Queen', 'Rook', 'Bishop', 'Knight']
+    
+    # Create promotion window
+    dialog_width = 400
+    dialog_height = 150
+    dialog_x = (size[0] - dialog_width) // 2
+    dialog_y = (size[1] - dialog_height) // 2
+    
+    # Button dimensions
+    button_width = 80
+    button_height = 80
+    button_spacing = 10
+    start_x = dialog_x + (dialog_width - (4 * button_width + 3 * button_spacing)) // 2
+    start_y = dialog_y + 50
+    
+    # Create buttons with rects
+    buttons = []
+    for i in range(4):
+        rect = pygame.Rect(start_x + i * (button_width + button_spacing), start_y, button_width, button_height)
+        buttons.append((rect, options[i], promotion_pieces[i]))
+    
+    # Dialog loop
+    choosing = True
+    while choosing:
+        # Draw semi-transparent overlay
+        overlay = pygame.Surface(size)
+        overlay.set_alpha(128)
+        overlay.fill((0, 0, 0))
+        screen.blit(overlay, (0, 0))
+        
+        # Draw dialog background
+        pygame.draw.rect(screen, (100, 100, 100), (dialog_x, dialog_y, dialog_width, dialog_height))
+        pygame.draw.rect(screen, (255, 255, 255), (dialog_x, dialog_y, dialog_width, dialog_height), 2)
+        
+        # Draw title
+        font = pygame.font.SysFont('arial', 20)
+        title = font.render('Promote Pawn To:', True, (255, 255, 255))
+        title_rect = title.get_rect()
+        title_rect.center = (dialog_x + dialog_width // 2, dialog_y + 15)
+        screen.blit(title, title_rect)
+        
+        # Draw buttons
+        for i, (rect, piece_value, piece_sprite) in enumerate(buttons):
+            pygame.draw.rect(screen, (200, 200, 200), rect)
+            pygame.draw.rect(screen, (255, 255, 255), rect, 2)
+            screen.blit(piece_sprite, rect)
+        
+        pygame.display.flip()
+        clock.tick(fps)
+        
+        # Handle events
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                choosing = False
+                return pawn_piece  # Default to pawn if window closed
+            if event.type == pygame.MOUSEBUTTONDOWN:
+                mouse_pos = event.pos
+                for rect, piece_value, _ in buttons:
+                    if rect.collidepoint(mouse_pos):
+                        return piece_value
+    
+    return pawn_piece
+
 running = True
 while running:
     screen.fill("black")
@@ -289,6 +370,8 @@ while running:
                     # Update movement tracking flags when move is completed
                     handle_movement_flags(chosen_piece, chosen_row, chosen_col)
                     
+                    chosen_piece = handle_pawn_promotion(chosen_piece, new_row)
+
                     offset = 10 if offset == 0 else 0
                     chosen_row, chosen_col = new_row, new_col
                 field[chosen_row][chosen_col] = chosen_piece
