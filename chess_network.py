@@ -1,6 +1,5 @@
 import socket
 import json
-import threading
 
 class ChessServer:
     def __init__(self, host='0.0.0.0', port=5000):
@@ -23,6 +22,7 @@ class ChessServer:
     def send_move(self, move_data):
         """Send move to opponent"""
         try:
+            print(f"Sending move: {move_data}")
             message = json.dumps(move_data)
             self.client_socket.sendall(message.encode())
         except Exception as e:
@@ -69,6 +69,7 @@ class ChessClient:
         """Receive move from opponent"""
         try:
             message = self.socket.recv(1024).decode()
+            print(f"Received move: {message}")
             if message:
                 return json.loads(message)
         except Exception as e:
