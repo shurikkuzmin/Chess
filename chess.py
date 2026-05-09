@@ -1,5 +1,21 @@
 import pygame
+import argparse
+from chess_network import ChessServer, ChessClient
+
+
 pygame.init()
+
+
+parser = argparse.ArgumentParser()
+parser.add_argument('--mode', choices=['server', 'client'], required=True, help='Run as server or client')
+args = parser.parse_args()
+
+if args.mode == 'server':
+    server = ChessServer()
+    server.start()
+elif args.mode == 'client':
+    client = ChessClient()
+    client.connect()
 
 fps = 60
 clock = pygame.time.Clock()
