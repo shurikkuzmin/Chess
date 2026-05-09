@@ -1,5 +1,6 @@
 import pygame
 import argparse
+import sys
 from chess_network import ChessServer, ChessClient
 
 
@@ -7,15 +8,37 @@ pygame.init()
 
 
 parser = argparse.ArgumentParser()
-parser.add_argument('--mode', choices=['server', 'client'], required=True, help='Run as server or client')
+parser.add_argument('--mode', nargs='?', default='local', 
+                    choices=['server', 'client', 'local'], 
+                    help='Run as server or client or local')
+parser.add_argument('--host', default='localhost', 
+                    help='Host to connect to (default: localhost)')
+parser.add_argument('--port', type=int, default=5000, 
+                    help='Port to connect')
 args = parser.parse_args()
 
+is_server = args.mode == 'server'
+network = None
+opponent_move = None
+
 if args.mode == 'server':
-    server = ChessServer()
-    server.start()
+    network = ChessServer(host=args.host, port=args.port)
+    network.start()
 elif args.mode == 'client':
-    client = ChessClient()
-    client.connect()
+    network = ChessClient(host=args.host, port=args.port)
+    network.connect()
+    try:
+        network.connect()
+        print("Connected to server!")
+    except ConnectionRefusedError:
+        print(f"Error: Could not connect to {args.host}:{args.port}")
+        print("Make sure the server is running.")
+        sys.exit(1)
+    except Exception as e:
+        print(f"Connection error: {e}")
+        sys.exit(1)
+elif args.mode == 'local':
+    pass
 
 fps = 60
 clock = pygame.time.Clock()
