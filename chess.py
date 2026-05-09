@@ -40,6 +40,43 @@ elif args.mode == 'client':
 elif args.mode == 'local':
     pass
 
+if network:
+    import threading
+    def receive_opponent_move():
+        global network, opponent_move
+        while network and network.running:
+            move = network.receive_move()
+            if move:
+                opponent_move = move
+    
+    receive_thread = threading.Thread(target=receive_opponent_move, daemon=True)
+    receive_thread.start()
+
+if network:
+    import threading
+    def receive_opponent_move():
+        global network, opponent_move
+        while network and network.running:
+            move = network.receive_move()
+            if move:
+                opponent_move = move
+    
+    receive_thread = threading.Thread(target=receive_opponent_move, daemon=True)
+    receive_thread.start()
+
+def send_move_to_opponent(old_row, old_col, new_row, new_col, piece):
+    """Send completed move to opponent"""
+    global network
+    if network:
+        move_data = {
+            'old_row': old_row,
+            'old_col': old_col,
+            'new_row': new_row,
+            'new_col': new_col,
+            'piece': piece
+        }
+        network.send_move(move_data)
+
 fps = 60
 clock = pygame.time.Clock()
 
