@@ -448,11 +448,29 @@ while running:
                     
                     chosen_piece = handle_pawn_promotion(chosen_piece, new_row)
 
+                    send_move_to_opponent(chosen_row, chosen_col, new_row, new_col, chosen_piece)
+
                     offset = 10 if offset == 0 else 0
                     chosen_row, chosen_col = new_row, new_col
                 field[chosen_row][chosen_col] = chosen_piece
                 chosen_piece = 0
     
+    if opponent_move:
+        move = opponent_move
+        opponent_move = None
+        
+        # Handle castling for opponent's move
+        #handle_castling(move['piece'], move['old_row'], move['old_col'], move['new_row'], move['new_col'])
+        
+        # Update movement tracking flags for opponent's move
+        #handle_movement_flags(move['piece'], move['old_row'], move['old_col'])
+        
+        # Handle pawn promotion for opponent's move
+        #promoted_piece = handle_pawn_promotion(move['piece'], move['new_row'])
+        
+        field[move['old_row']][move['old_col']] = 0
+        field[move['new_row']][move['new_col']] = move['piece']
+
     draw_field()
     pygame.display.flip()
     clock.tick(fps)
