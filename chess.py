@@ -475,4 +475,7 @@ while running:
     pygame.display.flip()
     clock.tick(fps)
 
+if network:
+    network.stop()
+
 pygame.quit()
