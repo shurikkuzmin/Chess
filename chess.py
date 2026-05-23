@@ -26,7 +26,6 @@ if args.mode == 'server':
     network.start()
 elif args.mode == 'client':
     network = ChessClient(host=args.host, port=args.port)
-    network.connect()
     try:
         network.connect()
         print("Connected to server!")
@@ -45,7 +44,6 @@ if network:
     def receive_opponent_move():
         global network, opponent_move
         while network and network.running:
-            print("Entering receive move")
             move = network.receive_move()
             if move:
                 print(f"Received move: {move}")
