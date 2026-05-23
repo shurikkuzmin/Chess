@@ -57,7 +57,9 @@ if network:
     def receive_opponent_move():
         global network, opponent_move
         while network and network.running:
+            print("Entering receive move")
             move = network.receive_move()
+            print(f"Received move: {move}")
             if move:
                 opponent_move = move
     
@@ -476,6 +478,6 @@ while running:
     clock.tick(fps)
 
 if network:
-    network.stop()
+    network.close()
 
 pygame.quit()

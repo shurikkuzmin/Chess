@@ -16,6 +16,7 @@ class ChessServer:
         self.server_socket.listen(1)
         print(f"Server listening on {self.host}:{self.port}")
         self.client_socket, addr = self.server_socket.accept()
+        self.client_socket.settimeout(5)
         print(f"Client connected from {addr}")
         self.running = True
         
@@ -27,6 +28,7 @@ class ChessServer:
             self.client_socket.sendall(message.encode())
         except Exception as e:
             print(f"Error sending move: {e}")
+            self.running = False
             
     def receive_move(self):
         """Receive move from opponent"""
@@ -34,8 +36,11 @@ class ChessServer:
             message = self.client_socket.recv(1024).decode()
             if message:
                 return json.loads(message)
+        except socket.timeout:
+            return None
         except Exception as e:
             print(f"Error receiving move: {e}")
+            self.running = False
         return None
         
     def close(self):
@@ -53,6 +58,7 @@ class ChessClient:
         
     def connect(self):
         self.socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        self.socket.settimeout(5)
         self.socket.connect((self.host, self.port))
         print(f"Connected to server at {self.host}:{self.port}")
         self.running = True
@@ -64,7 +70,8 @@ class ChessClient:
             self.socket.sendall(message.encode())
         except Exception as e:
             print(f"Error sending move: {e}")
-            
+            self.running = False
+
     def receive_move(self):
         """Receive move from opponent"""
         try:
@@ -72,10 +79,14 @@ class ChessClient:
             print(f"Received move: {message}")
             if message:
                 return json.loads(message)
+        except socket.timeout:
+            return None
         except Exception as e:
             print(f"Error receiving move: {e}")
+            self.running = False
         return None
         
     def close(self):
         if self.socket:
             self.socket.close()
+        self.running = False
