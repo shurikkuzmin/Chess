@@ -77,6 +77,10 @@ chosen_piece = 0
 chosen_col = -1
 chosen_row = -1
 offset = 0
+
+if not is_server and network:
+    offset = 10  # Client pieces are offset by 10 to differentiate from server pieces
+
 white_king_moved = False
 black_king_moved = False
 white_left_rook_moved = False
@@ -407,6 +411,10 @@ def show_promotion_dialog(pawn_piece):
     
     return pawn_piece
 
+my_turn = True
+if network:
+    my_turn = is_server  # Server starts first
+
 running = True
 while running:
     screen.fill("black")
@@ -415,6 +423,8 @@ while running:
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             running = False
+        if not my_turn:
+            continue
         if event.type == pygame.MOUSEBUTTONDOWN:
             mouse_x, mouse_y = event.pos
             chosen_col = mouse_x // box_size - 1
@@ -438,7 +448,10 @@ while running:
 
                     send_move_to_opponent(chosen_row, chosen_col, new_row, new_col, chosen_piece)
 
-                    offset = 10 if offset == 0 else 0
+                    if not network:
+                        offset = 10 if offset == 0 else 0
+                    else:
+                        my_turn = False  # It's now opponent's turn
                     chosen_row, chosen_col = new_row, new_col
                 field[chosen_row][chosen_col] = chosen_piece
                 chosen_piece = 0
@@ -446,6 +459,7 @@ while running:
     if opponent_move:
         move = opponent_move
         opponent_move = None
+        my_turn = True  # It's now our turn after processing opponent's move
         
         # Handle castling for opponent's move
         #handle_castling(move['piece'], move['old_row'], move['old_col'], move['new_row'], move['new_col'])
