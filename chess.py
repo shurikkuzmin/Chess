@@ -47,8 +47,8 @@ if network:
         while network and network.running:
             print("Entering receive move")
             move = network.receive_move()
-            print(f"Received move: {move}")
             if move:
+                print(f"Received move: {move}")
                 opponent_move = move
     
     receive_thread = threading.Thread(target=receive_opponent_move, daemon=True)
