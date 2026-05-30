@@ -411,10 +411,28 @@ def show_promotion_dialog(pawn_piece):
     
     return pawn_piece
 
+def handle_game_over():
+    """Display game over message and wait for user to close the window"""
+    font = pygame.font.SysFont('arial', 50)
+    message = font.render('Game Over', True, (255, 0, 0))
+    message_rect = message.get_rect()
+    message_rect.center = (size[0] // 2, size[1] // 2)
+    
+    while True:
+        screen.fill((0, 0, 0))
+        screen.blit(message, message_rect)
+        pygame.display.flip()
+        clock.tick(fps)
+        
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                return
+
 my_turn = True
 if network:
     my_turn = is_server  # Server starts first
 
+game_over = False
 running = True
 while running:
     screen.fill("black")
@@ -423,6 +441,9 @@ while running:
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             running = False
+        if game_over:
+            handle_game_over()
+            continue
         if not my_turn:
             continue
         if event.type == pygame.MOUSEBUTTONDOWN:
@@ -453,6 +474,8 @@ while running:
                     else:
                         my_turn = False  # It's now opponent's turn
                     chosen_row, chosen_col = new_row, new_col
+                if field[chosen_row][chosen_col] == 6 or field[chosen_row][chosen_col] == 16:
+                    game_over = True
                 field[chosen_row][chosen_col] = chosen_piece
                 chosen_piece = 0
     
