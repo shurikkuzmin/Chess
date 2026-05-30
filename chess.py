@@ -413,20 +413,12 @@ def show_promotion_dialog(pawn_piece):
 
 def handle_game_over():
     """Display game over message and wait for user to close the window"""
-    font = pygame.font.SysFont('arial', 50)
+    font = pygame.font.SysFont('arial', 100, bold=True)
     message = font.render('Game Over', True, (255, 0, 0))
     message_rect = message.get_rect()
     message_rect.center = (size[0] // 2, size[1] // 2)
     
-    while True:
-        screen.fill((0, 0, 0))
-        screen.blit(message, message_rect)
-        pygame.display.flip()
-        clock.tick(fps)
-        
-        for event in pygame.event.get():
-            if event.type == pygame.QUIT:
-                return
+    screen.blit(message, message_rect)
 
 my_turn = True
 if network:
@@ -442,7 +434,6 @@ while running:
         if event.type == pygame.QUIT:
             running = False
         if game_over:
-            handle_game_over()
             continue
         if not my_turn:
             continue
@@ -493,10 +484,14 @@ while running:
         # Handle pawn promotion for opponent's move
         #promoted_piece = handle_pawn_promotion(move['piece'], move['new_row'])
         
+        if field[move['new_row']][move['new_col']] in [6, 16]:            
+            game_over = True
         field[move['old_row']][move['old_col']] = 0
         field[move['new_row']][move['new_col']] = move['piece']
 
     draw_field()
+    if game_over:
+        handle_game_over()
     pygame.display.flip()
     clock.tick(fps)
 
