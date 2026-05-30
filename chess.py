@@ -476,15 +476,13 @@ while running:
         my_turn = True  # It's now our turn after processing opponent's move
         
         # Handle castling for opponent's move
-        #handle_castling(move['piece'], move['old_row'], move['old_col'], move['new_row'], move['new_col'])
+        handle_castling(move['piece'], move['old_row'], move['old_col'], move['new_row'], move['new_col'])
         
         # Update movement tracking flags for opponent's move
-        #handle_movement_flags(move['piece'], move['old_row'], move['old_col'])
+        handle_movement_flags(move['piece'], move['old_row'], move['old_col'])
         
-        # Handle pawn promotion for opponent's move
-        #promoted_piece = handle_pawn_promotion(move['piece'], move['new_row'])
-        
-        if field[move['new_row']][move['new_col']] in [6, 16]:            
+        if field[move['new_row']][move['new_col']] == 6 or \
+            field[move['new_row']][move['new_col']] == 16:
             game_over = True
         field[move['old_row']][move['old_col']] = 0
         field[move['new_row']][move['new_col']] = move['piece']
